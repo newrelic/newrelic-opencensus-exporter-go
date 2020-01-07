@@ -47,7 +47,13 @@ var emptySpanID trace.SpanID
 // NewExporter creates a new Exporter.  serviceName is the name of this service
 // or application.  apiKey is required.
 func NewExporter(serviceName, apiKey string, options ...func(*telemetry.Config)) (*Exporter, error) {
-	options = append([]func(*telemetry.Config){telemetry.ConfigAPIKey(apiKey)}, options...)
+	options = append([]func(*telemetry.Config){
+		func(cfg *telemetry.Config) {
+			cfg.Product = userAgentProduct
+			cfg.ProductVersion = version
+		},
+		telemetry.ConfigAPIKey(apiKey),
+	}, options...)
 	h, err := telemetry.NewHarvester(options...)
 	if nil != err {
 		return nil, err
