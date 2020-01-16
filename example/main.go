@@ -30,7 +30,7 @@ func mustGetEnv(v string) string {
 
 func main() {
 	exporter, err := nrcensus.NewExporter("Example App",
-		mustGetEnv("NEW_RELIC_API_KEY"),
+		mustGetEnv("NEW_RELIC_INSIGHTS_INSERT_API_KEY"),
 		telemetry.ConfigBasicErrorLogger(os.Stderr),
 		telemetry.ConfigBasicDebugLogger(os.Stdout),
 	)
