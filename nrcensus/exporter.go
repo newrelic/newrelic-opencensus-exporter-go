@@ -45,7 +45,7 @@ type Exporter struct {
 var emptySpanID trace.SpanID
 
 // NewExporter creates a new Exporter.  serviceName is the name of this service
-// or application.  apiKey is required.
+// or application.  apiKey is required and refers to a New Relic Insights Insert API key.
 func NewExporter(serviceName, apiKey string, options ...func(*telemetry.Config)) (*Exporter, error) {
 	options = append([]func(*telemetry.Config){
 		func(cfg *telemetry.Config) {
