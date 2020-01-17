@@ -162,12 +162,13 @@ func (e *Exporter) ExportView(vd *view.Data) {
 		return
 	}
 	for _, row := range vd.Rows {
-		attrs := make(map[string]interface{}, len(row.Tags)+2)
+		attrs := make(map[string]interface{}, len(row.Tags)+3)
 		for _, tag := range row.Tags {
 			attrs[tag.Key.Name()] = tag.Value
 		}
 		attrs["measure.name"] = vd.View.Measure.Name()
 		attrs["measure.unit"] = vd.View.Measure.Unit()
+		attrs["service.name"] = e.ServiceName
 
 		switch data := row.Data.(type) {
 		case *view.CountData:
