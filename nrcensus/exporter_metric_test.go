@@ -165,6 +165,7 @@ func TestCountMetrics(t *testing.T) {
 			"second":       "secondValue",
 			"measure.name": "tests",
 			"measure.unit": "t",
+			"service.name": "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -174,7 +175,7 @@ func TestCountMetrics(t *testing.T) {
 		Value:          0,
 		Timestamp:      testTime.Add(10 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue"}`),
+		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -183,7 +184,7 @@ func TestCountMetrics(t *testing.T) {
 		Value:          5,
 		Timestamp:      testTime.Add(20 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue"}`),
+		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -235,6 +236,7 @@ func TestSumMetrics(t *testing.T) {
 			"second":       "secondValue",
 			"measure.name": "tests",
 			"measure.unit": "t",
+			"service.name": "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -244,7 +246,7 @@ func TestSumMetrics(t *testing.T) {
 		Value:          0,
 		Timestamp:      testTime.Add(10 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue"}`),
+		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -253,7 +255,7 @@ func TestSumMetrics(t *testing.T) {
 		Value:          5,
 		Timestamp:      testTime.Add(20 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue"}`),
+		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -304,6 +306,7 @@ func TestLastValueMetrics(t *testing.T) {
 			"second":       "secondValue",
 			"measure.name": "tests",
 			"measure.unit": "t",
+			"service.name": "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -317,6 +320,7 @@ func TestLastValueMetrics(t *testing.T) {
 			"second":       "secondValue",
 			"measure.name": "tests",
 			"measure.unit": "t",
+			"service.name": "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -330,6 +334,7 @@ func TestLastValueMetrics(t *testing.T) {
 			"second":       "secondValue",
 			"measure.name": "tests",
 			"measure.unit": "t",
+			"service.name": "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
