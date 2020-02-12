@@ -61,7 +61,9 @@ func TestSpanGeneric(t *testing.T) {
 		Timestamp:   testTime,
 		Duration:    time.Second,
 		Attributes: map[string]interface{}{
-			"color": "purple",
+			"color":                    "purple",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
 		},
 	}) {
 		t.Errorf("span fields are incorrect: %#v", span)
@@ -98,7 +100,9 @@ func TestSpanParentID(t *testing.T) {
 		Timestamp:   testTime,
 		Duration:    time.Second,
 		Attributes: map[string]interface{}{
-			"color": "purple",
+			"color":                    "purple",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
 		},
 	}) {
 		t.Errorf("span fields are incorrect: %#v", span)
@@ -127,7 +131,9 @@ func TestSpanErrorAttrHonored(t *testing.T) {
 		Timestamp:   testTime,
 		Duration:    time.Second,
 		Attributes: map[string]interface{}{
-			"error": "hello world",
+			"error":                    "hello world",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
 		},
 	}) {
 		t.Errorf("span fields are incorrect: %#v", span)
@@ -153,7 +159,10 @@ func TestSpanErrorIgnoredHonored(t *testing.T) {
 		ServiceName: "serviceName",
 		Timestamp:   testTime,
 		Duration:    time.Second,
-		Attributes:  nil,
+		Attributes: map[string]interface{}{
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+		},
 	}) {
 		t.Errorf("span fields are incorrect: %#v", span)
 	}
@@ -178,10 +187,42 @@ func TestSpanErrorRecorded(t *testing.T) {
 		Timestamp:   testTime,
 		Duration:    time.Second,
 		Attributes: map[string]interface{}{
-			"error": true,
+			"error":                    true,
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
 		},
 	}) {
 		t.Errorf("span fields are incorrect: %#v", span)
+	}
+}
+
+func TestSpanInstAttrsOverwritten(t *testing.T) {
+	h := &testHarvester{}
+	exp := &Exporter{
+		Harvester:   h,
+		ServiceName: "serviceName",
+	}
+	sd := &trace.SpanData{
+		StartTime: testTime,
+		EndTime:   testTime.Add(time.Second),
+		Attributes: map[string]interface{}{
+			"instrumentation.provider": "invalid provider",
+			"collector.name":           "invalid collector",
+		},
+	}
+	exp.ExportSpan(sd)
+	sd.Attributes = map[string]interface{}{"instrumentation.provider": "totally invalid provider"}
+	exp.ExportSpan(sd)
+	sd.Attributes = map[string]interface{}{"collector.name": "totally invalid collector"}
+	exp.ExportSpan(sd)
+	want := map[string]interface{}{
+		"instrumentation.provider": instrumentationProvider,
+		"collector.name":           collectorName,
+	}
+	for _, s := range h.spans {
+		if !reflect.DeepEqual(s.Attributes, want) {
+			t.Errorf("invalid attributes: got %#v, want %#v", s.Attributes, want)
+		}
 	}
 }
 
@@ -229,7 +270,9 @@ func TestSpanUsingOpenCensusAPI(t *testing.T) {
 		Timestamp:   childSpan.Timestamp,
 		Duration:    childSpan.Duration,
 		Attributes: map[string]interface{}{
-			"error": true,
+			"error":                    true,
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
 		},
 	}) {
 		t.Errorf("child span fields are incorrect: %#v", childSpan)
@@ -244,7 +287,10 @@ func TestSpanUsingOpenCensusAPI(t *testing.T) {
 		ServiceName: "serviceName",
 		Timestamp:   parentSpan.Timestamp,
 		Duration:    parentSpan.Duration,
-		Attributes:  nil,
+		Attributes: map[string]interface{}{
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+		},
 	}) {
 		t.Errorf("parent span fields are incorrect: %#v", parentSpan)
 	}
@@ -284,4 +330,43 @@ func TestSpanNilExporter(t *testing.T) {
 		},
 	}
 	exp.ExportSpan(sd)
+}
+
+func TestSpanAttrLen(t *testing.T) {
+	exp := &Exporter{IgnoreStatusCodes: []int32{}}
+	sd := &trace.SpanData{
+		SpanContext: trace.SpanContext{
+			SpanID:  testSpanID,
+			TraceID: testTraceID,
+		},
+		Name:      "spanName",
+		StartTime: testTime,
+		EndTime:   testTime.Add(time.Second),
+		Attributes: map[string]interface{}{
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+		},
+	}
+
+	// If desired attributes already exist and no errors, the length should
+	// just be the existing number of attributes.
+	want := len(sd.Attributes)
+	if got := exp.spanAttrLen(sd); got != want {
+		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
+	}
+
+	// Removing the expected attributes means the length returned should be
+	// that many more.
+	want = 2
+	sd.Attributes = map[string]interface{}{}
+	if got := exp.spanAttrLen(sd); got != want {
+		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
+	}
+
+	// Marking as errored should add an additional attribute.
+	want++
+	sd.Status = trace.Status{Code: trace.StatusCodePermissionDenied}
+	if got := exp.spanAttrLen(sd); got != want {
+		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
+	}
 }

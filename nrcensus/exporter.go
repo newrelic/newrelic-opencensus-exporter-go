@@ -85,6 +85,26 @@ func (e *Exporter) ExportSpan(s *trace.SpanData) {
 		return
 	}
 
+	var attrs map[string]interface{}
+	if l := e.spanAttrLen(s); l != len(s.Attributes) {
+		attrs = make(map[string]interface{}, l)
+		// Upstream `error` attribute should be preserved.
+		if e.responseCodeIsError(s.Status.Code) {
+			attrs["error"] = true
+		}
+		for k, v := range s.Attributes {
+			attrs[k] = v
+		}
+		// This exporter defines these values, overwrite if they exist.
+		attrs["instrumentation.provider"] = instrumentationProvider
+		attrs["collector.name"] = collectorName
+	} else {
+		attrs = s.Attributes
+		// Ensure these are correctly set.
+		attrs["instrumentation.provider"] = instrumentationProvider
+		attrs["collector.name"] = collectorName
+	}
+
 	sp := telemetry.Span{
 		ID:          s.SpanContext.SpanID.String(),
 		TraceID:     s.SpanContext.TraceID.String(),
@@ -92,18 +112,7 @@ func (e *Exporter) ExportSpan(s *trace.SpanData) {
 		Timestamp:   s.StartTime,
 		Duration:    s.EndTime.Sub(s.StartTime),
 		ServiceName: e.ServiceName,
-		Attributes:  s.Attributes,
-	}
-
-	if e.responseCodeIsError(s.Status.Code) {
-		if _, ok := s.Attributes["error"]; !ok {
-			attrs := make(map[string]interface{}, len(s.Attributes)+1)
-			for k, v := range s.Attributes {
-				attrs[k] = v
-			}
-			attrs["error"] = true
-			sp.Attributes = attrs
-		}
+		Attributes:  attrs,
 	}
 
 	if s.ParentSpanID != emptySpanID {
@@ -114,6 +123,21 @@ func (e *Exporter) ExportSpan(s *trace.SpanData) {
 		return
 	}
 	e.Harvester.RecordSpan(sp)
+}
+
+// spanAttrLen returns the number of attributes a span will contain.
+func (e *Exporter) spanAttrLen(s *trace.SpanData) int {
+	l := len(s.Attributes)
+	if e.responseCodeIsError(s.Status.Code) {
+		l++
+	}
+	if _, ok := s.Attributes["instrumentation.provider"]; !ok {
+		l++
+	}
+	if _, ok := s.Attributes["collector.name"]; !ok {
+		l++
+	}
+	return l
 }
 
 func (e *Exporter) recordCountData(vd *view.Data, data *view.CountData, attrs map[string]interface{}) {
@@ -162,10 +186,12 @@ func (e *Exporter) ExportView(vd *view.Data) {
 		return
 	}
 	for _, row := range vd.Rows {
-		attrs := make(map[string]interface{}, len(row.Tags)+3)
+		attrs := make(map[string]interface{}, len(row.Tags)+5)
 		for _, tag := range row.Tags {
 			attrs[tag.Key.Name()] = tag.Value
 		}
+		attrs["instrumentation.provider"] = instrumentationProvider
+		attrs["collector.name"] = collectorName
 		attrs["measure.name"] = vd.View.Measure.Name()
 		attrs["measure.unit"] = vd.View.Measure.Unit()
 		attrs["service.name"] = e.ServiceName
