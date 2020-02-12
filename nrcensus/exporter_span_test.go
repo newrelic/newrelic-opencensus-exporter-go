@@ -333,40 +333,73 @@ func TestSpanNilExporter(t *testing.T) {
 }
 
 func TestSpanAttrLen(t *testing.T) {
+	tests := []struct {
+		Attrs map[string]interface{}
+		Error bool
+		Want  int
+	}{
+		{
+			Attrs: map[string]interface{}{
+				"instrumentation.provider": instrumentationProvider,
+				"collector.name":           collectorName,
+			},
+			Error: false,
+			Want:  2,
+		},
+		{
+			Attrs: map[string]interface{}{
+				"instrumentation.provider": instrumentationProvider,
+				"collector.name":           collectorName,
+			},
+			Error: true,
+			Want:  3,
+		},
+		{
+			Attrs: map[string]interface{}{
+				"first key":  "first value",
+				"second key": "second value",
+			},
+			Error: false,
+			Want:  4,
+		},
+		{
+			Attrs: map[string]interface{}{
+				"first key":  "first value",
+				"second key": "second value",
+			},
+			Error: true,
+			Want:  5,
+		},
+		{
+			Attrs: map[string]interface{}{
+				"error": "some value",
+			},
+			Error: true,
+			Want:  3,
+		},
+		{
+			Attrs: map[string]interface{}{
+				"error": "some value",
+			},
+			Error: false,
+			Want:  3,
+		},
+		{
+			Attrs: map[string]interface{}{},
+			Error: false,
+			Want:  2,
+		},
+		{
+			Attrs: map[string]interface{}{},
+			Error: true,
+			Want:  3,
+		},
+	}
+
 	exp := &Exporter{IgnoreStatusCodes: []int32{}}
-	sd := &trace.SpanData{
-		SpanContext: trace.SpanContext{
-			SpanID:  testSpanID,
-			TraceID: testTraceID,
-		},
-		Name:      "spanName",
-		StartTime: testTime,
-		EndTime:   testTime.Add(time.Second),
-		Attributes: map[string]interface{}{
-			"instrumentation.provider": instrumentationProvider,
-			"collector.name":           collectorName,
-		},
-	}
-
-	// If desired attributes already exist and no errors, the length should
-	// just be the existing number of attributes.
-	want := len(sd.Attributes)
-	if got := exp.spanAttrLen(sd); got != want {
-		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
-	}
-
-	// Removing the expected attributes means the length returned should be
-	// that many more.
-	want = 2
-	sd.Attributes = map[string]interface{}{}
-	if got := exp.spanAttrLen(sd); got != want {
-		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
-	}
-
-	// Marking as errored should add an additional attribute.
-	want++
-	sd.Status = trace.Status{Code: trace.StatusCodePermissionDenied}
-	if got := exp.spanAttrLen(sd); got != want {
-		t.Errorf("unexpected number of attributes: want %d, got %d", want, got)
+	for _, test := range tests {
+		if got := exp.spanAttrLen(test.Attrs, test.Error); got != test.Want {
+			t.Errorf("Exporter.spanAttrLen(%#v, %t) = %d, want %d", test.Attrs, test.Error, got, test.Want)
+		}
 	}
 }

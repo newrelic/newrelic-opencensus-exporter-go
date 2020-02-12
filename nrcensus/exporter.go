@@ -85,25 +85,21 @@ func (e *Exporter) ExportSpan(s *trace.SpanData) {
 		return
 	}
 
-	var attrs map[string]interface{}
-	if l := e.spanAttrLen(s); l != len(s.Attributes) {
-		attrs = make(map[string]interface{}, l)
-		// Upstream `error` attribute should be preserved.
-		if e.responseCodeIsError(s.Status.Code) {
-			attrs["error"] = true
-		}
-		for k, v := range s.Attributes {
-			attrs[k] = v
-		}
-		// This exporter defines these values, overwrite if they exist.
-		attrs["instrumentation.provider"] = instrumentationProvider
-		attrs["collector.name"] = collectorName
-	} else {
-		attrs = s.Attributes
-		// Ensure these are correctly set.
-		attrs["instrumentation.provider"] = instrumentationProvider
-		attrs["collector.name"] = collectorName
+	// This is a somewhat expensive call, so be sure to only do this once.
+	isErr := e.responseCodeIsError(s.Status.Code)
+	// Make a new attribute map instead of updating the original in order to
+	// not change the passed attributes.
+	attrs := make(map[string]interface{}, e.spanAttrLen(s.Attributes, isErr))
+	for k, v := range s.Attributes {
+		attrs[k] = v
 	}
+	// Preserve any passed `error` attribute.
+	if _, in := s.Attributes["error"]; !in && isErr {
+		attrs["error"] = true
+	}
+	// This exporter defines these values, overwrite if they exist.
+	attrs["instrumentation.provider"] = instrumentationProvider
+	attrs["collector.name"] = collectorName
 
 	sp := telemetry.Span{
 		ID:          s.SpanContext.SpanID.String(),
@@ -125,16 +121,17 @@ func (e *Exporter) ExportSpan(s *trace.SpanData) {
 	e.Harvester.RecordSpan(sp)
 }
 
-// spanAttrLen returns the number of attributes a span will contain.
-func (e *Exporter) spanAttrLen(s *trace.SpanData) int {
-	l := len(s.Attributes)
-	if e.responseCodeIsError(s.Status.Code) {
+// spanAttrLen returns the number of attributes that will be exported based on
+// the OpenCensus attrs and if the span isErr.
+func (e *Exporter) spanAttrLen(attrs map[string]interface{}, isErr bool) int {
+	l := len(attrs)
+	if _, in := attrs["error"]; !in && isErr {
 		l++
 	}
-	if _, ok := s.Attributes["instrumentation.provider"]; !ok {
+	if _, in := attrs["instrumentation.provider"]; !in {
 		l++
 	}
-	if _, ok := s.Attributes["collector.name"]; !ok {
+	if _, in := attrs["collector.name"]; !in {
 		l++
 	}
 	return l
