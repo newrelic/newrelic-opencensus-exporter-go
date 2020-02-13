@@ -161,11 +161,13 @@ func TestCountMetrics(t *testing.T) {
 		Timestamp: testTime,
 		Interval:  10 * time.Second,
 		Attributes: map[string]interface{}{
-			"first":        "firstValue",
-			"second":       "secondValue",
-			"measure.name": "tests",
-			"measure.unit": "t",
-			"service.name": "serviceName",
+			"first":                    "firstValue",
+			"second":                   "secondValue",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+			"measure.name":             "tests",
+			"measure.unit":             "t",
+			"service.name":             "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -175,7 +177,7 @@ func TestCountMetrics(t *testing.T) {
 		Value:          0,
 		Timestamp:      testTime.Add(10 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
+		AttributesJSON: json.RawMessage(`{"collector.name":"` + collectorName + `","first":"firstValue","instrumentation.provider":"` + instrumentationProvider + `","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -184,7 +186,7 @@ func TestCountMetrics(t *testing.T) {
 		Value:          5,
 		Timestamp:      testTime.Add(20 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
+		AttributesJSON: json.RawMessage(`{"collector.name":"` + collectorName + `","first":"firstValue","instrumentation.provider":"` + instrumentationProvider + `","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -232,11 +234,13 @@ func TestSumMetrics(t *testing.T) {
 		Timestamp: testTime,
 		Interval:  10 * time.Second,
 		Attributes: map[string]interface{}{
-			"first":        "firstValue",
-			"second":       "secondValue",
-			"measure.name": "tests",
-			"measure.unit": "t",
-			"service.name": "serviceName",
+			"first":                    "firstValue",
+			"second":                   "secondValue",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+			"measure.name":             "tests",
+			"measure.unit":             "t",
+			"service.name":             "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -246,7 +250,7 @@ func TestSumMetrics(t *testing.T) {
 		Value:          0,
 		Timestamp:      testTime.Add(10 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
+		AttributesJSON: json.RawMessage(`{"collector.name":"` + collectorName + `","first":"firstValue","instrumentation.provider":"` + instrumentationProvider + `","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -255,7 +259,7 @@ func TestSumMetrics(t *testing.T) {
 		Value:          5,
 		Timestamp:      testTime.Add(20 * time.Second),
 		Interval:       10 * time.Second,
-		AttributesJSON: json.RawMessage(`{"first":"firstValue","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
+		AttributesJSON: json.RawMessage(`{"collector.name":"` + collectorName + `","first":"firstValue","instrumentation.provider":"` + instrumentationProvider + `","measure.name":"tests","measure.unit":"t","second":"secondValue","service.name":"serviceName"}`),
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
 	}
@@ -302,11 +306,13 @@ func TestLastValueMetrics(t *testing.T) {
 		Value:     10,
 		Timestamp: testTime.Add(10 * time.Second),
 		Attributes: map[string]interface{}{
-			"first":        "firstValue",
-			"second":       "secondValue",
-			"measure.name": "tests",
-			"measure.unit": "t",
-			"service.name": "serviceName",
+			"first":                    "firstValue",
+			"second":                   "secondValue",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+			"measure.name":             "tests",
+			"measure.unit":             "t",
+			"service.name":             "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -316,11 +322,13 @@ func TestLastValueMetrics(t *testing.T) {
 		Value:     10,
 		Timestamp: testTime.Add(20 * time.Second),
 		Attributes: map[string]interface{}{
-			"first":        "firstValue",
-			"second":       "secondValue",
-			"measure.name": "tests",
-			"measure.unit": "t",
-			"service.name": "serviceName",
+			"first":                    "firstValue",
+			"second":                   "secondValue",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+			"measure.name":             "tests",
+			"measure.unit":             "t",
+			"service.name":             "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
@@ -330,11 +338,13 @@ func TestLastValueMetrics(t *testing.T) {
 		Value:     15,
 		Timestamp: testTime.Add(30 * time.Second),
 		Attributes: map[string]interface{}{
-			"first":        "firstValue",
-			"second":       "secondValue",
-			"measure.name": "tests",
-			"measure.unit": "t",
-			"service.name": "serviceName",
+			"first":                    "firstValue",
+			"second":                   "secondValue",
+			"instrumentation.provider": instrumentationProvider,
+			"collector.name":           collectorName,
+			"measure.name":             "tests",
+			"measure.unit":             "t",
+			"service.name":             "serviceName",
 		},
 	}) {
 		t.Errorf("metric fields are incorrect: %#v", metric)
