@@ -40,6 +40,19 @@ func main() {
 ```
 
 
+## Find and use your data
+
+Tips on how to find and query your data:
+
+- [Find metric data](https://docs.newrelic.com/docs/data-ingest-apis/get-data-new-relic/metric-api/introduction-metric-api#find-data).
+- [Find trace/span data](https://docs.newrelic.com/docs/understand-dependencies/distributed-tracing/trace-api/introduction-trace-api#view-data).
+
+For general querying information, see:
+
+- [Query New Relic data](https://docs.newrelic.com/docs/using-new-relic/data/understand-data/query-new-relic-data)
+- [Intro to NRQL](https://docs.newrelic.com/docs/query-data/nrql-new-relic-query-language/getting-started/nrql-syntax-clauses-functions)
+
+
 ## Licensing
 The New Relic Go OpenCensus exporter is licensed under the Apache 2.0 License.
 The New Relic Go OpenCensus exporter also uses source code from third party
@@ -64,14 +77,3 @@ API](https://docs.newrelic.com/docs/introduction-new-relic-metric-api) and [New
 Relic Trace API Requirements and
 Limits](https://docs.newrelic.com/docs/apm/distributed-tracing/trace-api/trace-api-general-requirements-limits)
 on the specifics of the rate limits.
-
-## Find and use your data
-
-Tips on how to find and query your data:
-- [Find metric data](https://docs.newrelic.com/docs/data-ingest-apis/get-data-new-relic/metric-api/introduction-metric-api#find-data).
-- [Find trace/span data](https://docs.newrelic.com/docs/understand-dependencies/distributed-tracing/trace-api/introduction-trace-api#view-data).
-
-For general querying information, see:
-- [Query New Relic data](https://docs.newrelic.com/docs/using-new-relic/data/understand-data/query-new-relic-data)
-- [Intro to NRQL](https://docs.newrelic.com/docs/query-data/nrql-new-relic-query-language/getting-started/nrql-syntax-clauses-functions)
-
