@@ -1,4 +1,4 @@
-# New Relic Go OpenCensus Exporter [![GoDoc](https://godoc.org/github.com/newrelic/newrelic-opencensus-exporter-go/nrcensus?status.svg)](https://godoc.org/github.com/newrelic/newrelic-opencensus-exporter-go/nrcensus)
+# New Relic Go OpenCensus exporter [![GoDoc](https://godoc.org/github.com/newrelic/newrelic-opencensus-exporter-go/nrcensus?status.svg)](https://godoc.org/github.com/newrelic/newrelic-opencensus-exporter-go/nrcensus)
 The `nrcensus` package provides an exporter for sending OpenCensus stats and
 traces to New Relic.
 
@@ -8,7 +8,7 @@ traces to New Relic.
 * Go v1.8 or newer
 
 
-## Installation
+## Install
 To install, just go get this package with
 
 ```
@@ -38,6 +38,16 @@ func main() {
     // create stats, traces, etc
 }
 ```
+
+## Find and use your data
+
+Tips on how to find and query your data:
+- [Find metric data](https://docs.newrelic.com/docs/data-ingest-apis/get-data-new-relic/metric-api/introduction-metric-api#find-data)
+- [Find trace/span data](https://docs.newrelic.com/docs/understand-dependencies/distributed-tracing/trace-api/introduction-trace-api#view-data)
+
+For general querying information, see:
+- [Query New Relic data](https://docs.newrelic.com/docs/using-new-relic/data/understand-data/query-new-relic-data)
+- [Intro to NRQL](https://docs.newrelic.com/docs/query-data/nrql-new-relic-query-language/getting-started/introduction-nrql)
 
 
 ## Find and use your data
